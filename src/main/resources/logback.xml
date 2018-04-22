@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+	<!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径 -->
+	<!-- <property name="LOG_HOME" value="/home/logs/server /> -->
+	<property name="LOG_HOME" value="E:/logs/nettyserver" />
+	
+	<property name="log_thirdpart" value="thirdpart_error"></property>
+	
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- encoder 默认配置为PatternLayoutEncoder -->
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-30thread] %-5level %logger{60} - %msg%n</pattern>
+		</encoder>
+	</appender>
+	
+	<appender name="FILEForWS"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_HOME}/core.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${LOG_HOME}/core.%i.log</fileNamePattern>
+			<minIndex>1</minIndex>
+			<maxIndex>21</maxIndex>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-30thread] %-5level %logger{60} - %msg%n</pattern>
+		</encoder>
+		<append>true</append>
+		<!-- 日志文件最大的大小 -->
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>20MB</MaxFileSize>
+		</triggeringPolicy>
+		<!-- 过滤INFO,对非INFO日志拒绝处理 -->
+        <!-- <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>   
+            <onMismatch>DENY</onMismatch>   
+        </filter> -->
+	</appender>
+	<!-- 盒子有关的日志 -->
+	<appender name="FILEForNetty"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_HOME}/monitor.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${LOG_HOME}/monitor.%i.log</fileNamePattern>
+			<!-- <fileNamePattern>E:/home/logs/netty/monitor.%i.log</fileNamePattern> -->
+			<minIndex>1</minIndex>
+			<maxIndex>21</maxIndex>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-30thread] %-5level %logger{60} - %msg%n</pattern>
+		</encoder>
+		<append>true</append>
+		<!--日志文件最大的大小 -->
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>20MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+
+	
+
+    <!--第三方包打印warn及以上的日志 -->
+    <appender name="FileForThirdPart"
+        class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${log_thirdpart}.log</file>
+        <rollingPolicy
+            class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/${log_thirdpart}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>60</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger-%msg%n</pattern>
+        </encoder>
+        <append>true</append>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter> 
+    </appender>
+	
+	
+	<!-- 日志输出级别 -->
+	<root level="info" >
+	    <appender-ref ref="STDOUT"/>
+		<appender-ref ref="FILEForWS" />
+	</root>
+	
+    <!-- 第三方日志 -->
+    <!-- netty 日志打印 -->
+    <logger name="io.netty" level="debug" additivity="false">
+        <appender-ref ref="FILEForNetty" />
+    </logger>
+	<logger name="org.springframework" level="WARN" additivity="false">
+	   <appender-ref ref="FileForThirdPart"/>
+	</logger>
+
+</configuration>
