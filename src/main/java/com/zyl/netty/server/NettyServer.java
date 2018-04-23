@@ -44,6 +44,8 @@ public class NettyServer implements ApplicationContextAware{
     private EventLoopGroup workerGroup;
 
     private EventLoopGroup bossGroup;
+
+    private LogicServerHandler logicServerHandler;
     
     
     @PostConstruct
@@ -52,6 +54,7 @@ public class NettyServer implements ApplicationContextAware{
         int coreNum = new Double(Runtime.getRuntime().availableProcessors()*2 / 0.2).intValue();
         bossGroup = new NioEventLoopGroup();
         workerGroup = new NioEventLoopGroup(coreNum);
+        logicServerHandler = new LogicServerHandler();
         
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         serverBootstrap.group(bossGroup, workerGroup)
@@ -67,10 +70,10 @@ public class NettyServer implements ApplicationContextAware{
                 .addLast(new IdleStateHandler(60, 60, 60,TimeUnit.SECONDS))
                 .addLast(new StringDecoder(Charset.forName("UTF-8")))
                 .addLast(new StringEncoder(Charset.forName("UTF-8")))
-                .addLast(new LogicServerHandler());
+                .addLast(logicServerHandler);
             }
         });
-        ChannelFuture cFuture = serverBootstrap.bind(9000).sync();
+        ChannelFuture cFuture = serverBootstrap.bind(6666).sync();
         channel = cFuture.channel();
         logger.info("netty start on port:9000");
     }

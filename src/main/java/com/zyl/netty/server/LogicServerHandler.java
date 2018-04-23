@@ -1,12 +1,12 @@
 package com.zyl.netty.server;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleState;
@@ -16,11 +16,15 @@ import io.netty.handler.timeout.IdleStateEvent;
  * author:zyl
  * date:2018年4月22日 下午11:04:41
  */
+@ChannelHandler.Sharable
 public class LogicServerHandler extends SimpleChannelInboundHandler<String>{
     private static Logger logger = LoggerFactory.getLogger(LogicServerHandler.class);
     
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        logger.info("handler:{}",this.toString());
+        logger.info("ctx:{}",ctx.toString());
+        logger.info("pipeline:{}",ctx.pipeline().hashCode());
         InetSocketAddress socketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
         logger.info("channelRegistered被调用,id:{},ip:{}",ctx.channel().id().asLongText(),socketAddress.getAddress().getHostAddress());
     }
@@ -32,11 +36,13 @@ public class LogicServerHandler extends SimpleChannelInboundHandler<String>{
     
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        logger.info("-----------------------------------");
         logger.info("handlerAdded被调用,id:{}",ctx.channel().id().asLongText());
     }
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         logger.info("handlerRemoved被调用,id:{}",ctx.channel().id().asLongText());
+        logger.info("-----------------------------------");
     }
 
 
@@ -97,6 +103,7 @@ public class LogicServerHandler extends SimpleChannelInboundHandler<String>{
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         logger.info("exceptionCaught 被调用");
+        logger.error(ctx.channel().remoteAddress().toString(), cause);
         Channel incoming = ctx.channel();
         if(!incoming.isActive()){
 //        super.exceptionCaught(ctx, cause);

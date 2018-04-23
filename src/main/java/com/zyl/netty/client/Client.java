@@ -14,7 +14,8 @@ public class Client {
     
     
     public static void main(String[] args) throws UnknownHostException, IOException {
-        Socket socket = new Socket("127.0.0.1", 9000);
+        Socket socket = new Socket("127.0.0.1", 6666);
+//        Socket socket = new Socket("120.77.252.107", 6666);
         
         
         new Thread(new Runnable() {
