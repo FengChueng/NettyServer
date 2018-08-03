@@ -54,7 +54,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>com.zyl.netty.NettyServer</mainClass>
+					<mainClass>com.zyl.netty.NettyServerApp</mainClass>
 				</configuration>
 				<executions>
 					<execution>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="true">
 	<!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径 -->
-	<!-- <property name="LOG_HOME" value="/home/logs/server /> -->
-	<property name="LOG_HOME" value="E:/logs/nettyserver" />
+	<property name="LOG_HOME" value="/home/logs/nettyserver" />
+	<!-- <property name="LOG_HOME" value="E:/logs/nettyserver" /> -->
 	
 	<property name="log_thirdpart" value="thirdpart_error"></property>
 	
@@ -59,6 +59,23 @@
 			<MaxFileSize>20MB</MaxFileSize>
 		</triggeringPolicy>
 	</appender>
+	
+    <appender name="FILEForClientMsg"
+        class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/client_msg.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/client_msg-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->  
+            <maxFileSize>50MB</maxFileSize>      
+            <maxHistory>60</maxHistory>  
+            <totalSizeCap>10GB</totalSizeCap>  
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%-26thread] {%msg}%n</pattern>
+        </encoder>
+        <append>true</append>
+    </appender>
 
 	
 
@@ -88,6 +105,10 @@
 	    <appender-ref ref="STDOUT"/>
 		<appender-ref ref="FILEForWS" />
 	</root>
+	
+   <logger name="com.zyl.netty.client" additivity="false">
+        <appender-ref ref="FILEForClientMsg" />
+    </logger>
 	
     <!-- 第三方日志 -->
     <!-- netty 日志打印 -->

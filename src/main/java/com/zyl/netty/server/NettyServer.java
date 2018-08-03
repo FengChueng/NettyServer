@@ -1,6 +1,5 @@
 package com.zyl.netty.server;
 
-import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -22,8 +21,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -66,14 +63,17 @@ public class NettyServer implements ApplicationContextAware{
         .childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
-                socketChannel.pipeline()
-                .addLast(new IdleStateHandler(60, 60, 60,TimeUnit.SECONDS))
-                .addLast(new StringDecoder(Charset.forName("UTF-8")))
-                .addLast(new StringEncoder(Charset.forName("UTF-8")))
-                .addLast(logicServerHandler);
+                socketChannel.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
+                socketChannel.pipeline().addLast(new IdleStateHandler(60, 60, 60,TimeUnit.SECONDS));
+                socketChannel.pipeline().addLast("decoder", new MonitorDecoder(applicationContext));//解码
+                socketChannel.pipeline().addLast("encoder", new MonitorEncoder());//编码
+                
+//                .addLast(new StringDecoder(Charset.forName("UTF-8")))
+//                .addLast(new StringEncoder(Charset.forName("UTF-8")))
+//                .addLast(logicServerHandler);
             }
         });
-        ChannelFuture cFuture = serverBootstrap.bind(6666).sync();
+        ChannelFuture cFuture = serverBootstrap.bind(9999).sync();
         channel = cFuture.channel();
         logger.info("netty start on port:9000");
     }
@@ -99,6 +99,9 @@ public class NettyServer implements ApplicationContextAware{
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         if (NettyServer.applicationContext == null) {
             NettyServer.applicationContext = applicationContext;
+        }
+        if(applicationContext == null){
+            System.out.println("初始化异常");
         }
         System.out.println("---------------------------------------------------------------------");
         System.out.println("========ApplicationContext配置成功========");
